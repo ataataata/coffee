@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   },
   basePath: '/coffee-grinder-converter',
   assetPrefix: '/coffee-grinder-converter/',
+  distDir: 'dist',
 }
 
 export default nextConfig

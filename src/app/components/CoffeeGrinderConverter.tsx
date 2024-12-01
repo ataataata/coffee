@@ -2,10 +2,102 @@
 
 import React, { useState } from 'react';
 
-// ... grinderData and calculation functions stay the same ...
+const grinderData = {
+  'Kingrinder K6': {
+    micronsPerClick: 16,
+    maxClicks: 240,
+    baseOffset: 0
+  },
+  'Kingrinder K1': {
+    micronsPerClick: 18,
+    maxClicks: 240,
+    baseOffset: 0
+  },
+  'Comandante C40': {
+    micronsPerClick: 30,
+    maxClicks: 50,
+    baseOffset: 0
+  },
+  'Porlex Mini 2': {
+    micronsPerClick: 37,
+    maxClicks: 50,
+    baseOffset: 0
+  },
+  'Timemore S3': {
+    micronsPerClick: 15,
+    maxClicks: 36,
+    baseOffset: 0
+  },
+  '1Zpresso Q2/J': {
+    micronsPerClick: 25,
+    maxClicks: 30,
+    baseOffset: 0
+  },
+  '1Zpresso JX-Pro/JE-Plus': {
+    micronsPerClick: 12.5,
+    maxClicks: 40,
+    baseOffset: 0
+  },
+  '1Zpresso X-Pro/X-Ultra': {
+    micronsPerClick: 12.5,
+    maxClicks: 60,
+    baseOffset: 0
+  },
+  '1Zpresso J-Max': {
+    micronsPerClick: 8.8,
+    maxClicks: 90,
+    baseOffset: 0
+  },
+  '1Zpresso J-Ultra': {
+    micronsPerClick: 8,
+    maxClicks: 100,
+    baseOffset: 0
+  },
+  '1Zpresso K-Plus/K-Pro/K-Max': {
+    micronsPerClick: 22,
+    maxClicks: 90,
+    baseOffset: 0
+  },
+  '1Zpresso K-Ultra': {
+    micronsPerClick: 20,
+    maxClicks: 100,
+    baseOffset: 0
+  }
+} as const;
+
+const calculateMicrons = (grinder: keyof typeof grinderData, clicks: number) => {
+  const { micronsPerClick, baseOffset } = grinderData[grinder];
+  return baseOffset + (clicks * micronsPerClick);
+};
+
+const calculateClicks = (grinder: keyof typeof grinderData, targetMicrons: number) => {
+  const { micronsPerClick, baseOffset, maxClicks } = grinderData[grinder];
+  const clicks = Math.round((targetMicrons - baseOffset) / micronsPerClick);
+  return Math.min(Math.max(0, clicks), maxClicks);
+};
 
 export default function CoffeeGrinderConverter() {
-  // ... state and handlers stay the same ...
+  const [sourceGrinder, setSourceGrinder] = useState<keyof typeof grinderData | ''>('');
+  const [targetGrinder, setTargetGrinder] = useState<keyof typeof grinderData | ''>('');
+  const [sourceValue, setSourceValue] = useState('');
+  const [result, setResult] = useState<{ clicks: number; microns: number } | null>(null);
+
+  const handleConversion = (value: string) => {
+    if (!sourceGrinder || !targetGrinder || !value) {
+      setResult(null);
+      return;
+    }
+
+    const clicks = Number(value);
+    const sourceMicrons = calculateMicrons(sourceGrinder, clicks);
+    const targetClicks = calculateClicks(targetGrinder, sourceMicrons);
+    const targetMicrons = calculateMicrons(targetGrinder, targetClicks);
+    
+    setResult({
+      clicks: targetClicks,
+      microns: targetMicrons
+    });
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 p-4">
